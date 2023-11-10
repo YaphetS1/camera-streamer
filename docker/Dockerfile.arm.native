@@ -1,0 +1,57 @@
+FROM balenalib/raspberrypi4-64-debian:build as build
+
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends \
+		gcc \
+		libavformat-dev \
+		libavutil-dev \
+		libavcodec-dev \
+        libcamera-dev \ 
+        liblivemedia-dev \
+        v4l-utils \
+        pkg-config \
+        xxd \
+        build-essential \
+        cmake \
+        libssl-dev \
+	&& rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build/camera-streamer/
+COPY . .
+RUN make
+
+FROM balenalib/raspberrypi4-64-debian:run as RUN
+
+# RUN apt-get update \
+# 	&& apt-get install -y --no-install-recommends \
+# 		libevent-2.1 \
+# 		libevent-pthreads-2.1-6 \
+# 		libjpeg8 \
+# 		libbsd0 \
+# 		libgpiod2 \
+# 	&& rm -rf /var/lib/apt/lists/*
+
+WORKDIR /camera-streamer
+COPY --from=build /build/camera-streamer/camera-streamer .
+
+RUN make install
+
+EXPOSE 8080
+ENTRYPOINT ["/usr/local/bin/camera-streamer", \
+            "-camera-path=/base/soc/i2c0mux/i2c@1/ov5647@36", \
+            "-camera-type=libcamera", "-camera-format=YUYV", \
+            "-camera-width=2592", "-camera-height=1944", \
+            "-camera-fps=30", \
+            "-camera-nbufs=4", \
+            "-camera-snapshot.height=2592", \
+            "-camera-video.height=1080", \
+            "-camera-stream.height=1080", \
+            "-camera-options=AeEnable=1" \
+            "-camera-options=AeExposureMode=2" \
+            "-camera-options=AwbEnable=1" \
+            "-camera-options=AwbMode=1" \
+            "--http-listen=0.0.0.0" \
+            "--http-port=8080" \
+            "-rtsp-port"]
+
+# vim: syntax=dockerfile
