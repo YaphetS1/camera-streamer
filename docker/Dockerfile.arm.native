@@ -16,7 +16,8 @@ COPY . .
 RUN make
 RUN make install
 
-# WARNING: Camera streamer starts but dtoverlay in /boot/config.txt - can't be override. So in docker it won't work
+# WARNING: Camera streamer starts but dtoverlay in /boot/config.txt - can't be containerized. So in docker it won't work
+# And than that we can't update dtoverlay to our camera type, means dtoverlay=ov5647
 
 EXPOSE 8080
 # ENTRYPOINT ["/bin/bash"]
