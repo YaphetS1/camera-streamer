@@ -18,10 +18,10 @@ ExecStart=/usr/local/bin/camera-streamer \
   --camera-nbufs=2 \
   ; the snapshot is 2592x1944
   --camera-snapshot.height=2592 \
-  ; the video/webrtc is 1920x1080
-  --camera-video.height=1080 \
-  ; the stream is 1920x1080
-  --camera-stream.height=1080 \
+  ; the video/webrtc is 1296x972
+  --camera-video.height=972 \
+  ; the stream is 1296x972
+  --camera-stream.height=972 \
   ; enable long autoexposure
   --camera-options=AeEnable=1 \
   --camera-options=AeExposureMode=2 \
